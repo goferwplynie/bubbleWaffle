@@ -19,7 +19,6 @@ func CreateComponent(path string, name string, opts ...*ComponentOptions) error 
 	if len(opts) > 0 {
 		options = opts[0]
 	}
-	fmt.Println(options)
 	mt := template.Must(template.New("mt").Parse(ModelTemplate))
 	it := template.Must(template.New("it").Parse(InitTemplate))
 	ut := template.Must(template.New("ut").Parse(UpdateTemplate))
