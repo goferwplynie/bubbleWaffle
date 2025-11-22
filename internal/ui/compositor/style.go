@@ -3,5 +3,7 @@ package compositor
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	listStyle = lipgloss.NewStyle().Padding(1, 2)
+	listStyle = lipgloss.NewStyle().Padding(1, 2).Border(lipgloss.RoundedBorder())
+
+	selected = lipgloss.NewStyle().Background(lipgloss.Color("67"))
 )

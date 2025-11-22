@@ -13,9 +13,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
+		default:
+			newList, cmds := m.list.Update(msg)
+			m.list = newList
+			return m, cmds
 		}
 
 	}
 	return m, nil
 }
-
