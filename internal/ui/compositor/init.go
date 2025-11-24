@@ -1,10 +1,10 @@
 package compositor
 
-import(
+import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *Model) Init() tea.Cmd{
+func (m *Model) Init() tea.Cmd {
 	return nil
 }
-	
+
