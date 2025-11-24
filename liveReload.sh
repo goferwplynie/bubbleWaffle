@@ -2,5 +2,6 @@
 
 # in foreground, continously run app
 while true; do
-    ./bin/bubbleWaffle tui 
+    cd internal/ui
+    ../../bin/bubbleWaffle tui 
 done
