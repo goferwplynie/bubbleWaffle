@@ -6,7 +6,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentcreate"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentlist"
-	zone "github.com/lrstanley/bubblezone"
 )
 
 const (
@@ -98,5 +97,5 @@ func (m *Model) View() string {
 		helpView = m.Help.View(m.Create.Keys)
 	}
 
-	return zone.Scan(content + "\n" + helpView)
+	return content + "\n" + helpView
 }

@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -9,7 +6,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/compositor"
-	zone "github.com/lrstanley/bubblezone"
 	"github.com/spf13/cobra"
 )
 
@@ -19,9 +15,8 @@ var tuiCmd = &cobra.Command{
 	Short: "open tui",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		zone.NewGlobal()
 		comp := compositor.New()
-		if _, err := tea.NewProgram(comp, tea.WithAltScreen(), tea.WithMouseCellMotion()).Run(); err != nil {
+		if _, err := tea.NewProgram(comp, tea.WithAltScreen()).Run(); err != nil {
 			fmt.Println("Error running program:", err)
 			os.Exit(1)
 		}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
-	zone "github.com/lrstanley/bubblezone"
 )
 
 func (m Model) View() string {
@@ -40,7 +39,7 @@ func (m Model) View() string {
 			checked = "[x]"
 		}
 
-		content += zone.Mark(opt.label, fmt.Sprintf("%s %s %s\n", cursor, style.Render(checked), opt.label))
+		content += fmt.Sprintf("%s %s %s\n", cursor, style.Render(checked), opt.label)
 	}
 
 	// Button
