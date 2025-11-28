@@ -34,8 +34,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			case 3:
 				m.CreateOptions.BubbleZone.checked = !m.CreateOptions.BubbleZone.checked
 			case 4:
-				// Create component logic is handled by returning a command or checking state in parent
-				// But here we can execute the creation and return a message
 				opts := &creator.ComponentOptions{
 					StyleFile:    m.CreateOptions.StyleFile.checked,
 					KeybindsFile: m.CreateOptions.KeybindsFile.checked,
@@ -45,9 +43,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					m.Err = err
 					return m, nil
 				}
-				// Return a success message or let parent handle it?
-				// Parent needs to know to switch back.
-				// We can return a custom message.
 				return m, func() tea.Msg { return ComponentCreatedMsg{} }
 			}
 		}

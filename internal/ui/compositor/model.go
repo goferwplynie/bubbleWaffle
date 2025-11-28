@@ -3,9 +3,13 @@ package compositor
 import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/goferwplynie/bubbleWaffle/internal/models"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentcreate"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentlist"
+	"github.com/goferwplynie/bubbleWaffle/internal/ui/metacomponent"
 )
 
 const (
@@ -16,6 +20,7 @@ const (
 type Model struct {
 	List   componentlist.Model
 	Create componentcreate.Model
+	Meta   metacomponent.Model
 	Help   help.Model
 	State  int
 	Width  int
@@ -27,6 +32,7 @@ func New() *Model {
 		List:   componentlist.New(),
 		Create: componentcreate.New(),
 		Help:   help.New(),
+		Meta:   metacomponent.New(),
 		State:  ListView,
 	}
 }
@@ -48,6 +54,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 		m.Create, cmd = m.Create.Update(msg)
 		cmds = append(cmds, cmd)
+		m.Meta, cmd = m.Meta.Update(msg)
+		cmds = append(cmds, cmd)
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -59,7 +67,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case ListView:
 			if key.Matches(msg, m.List.Keys.NewComponent) {
 				m.State = CreateView
-				// Reset create model state
 				m.Create = componentcreate.New()
 				m.Create.Width, m.Create.Height = m.Width, m.Height
 				return m, nil
@@ -79,6 +86,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case componentcreate.ComponentCreatedMsg:
 		m.List.RefreshList()
 		m.State = ListView
+
+	case models.ItemChangedMsg, models.ComponentMetaMsg:
+		m.Meta, cmd = m.Meta.Update(msg)
+		cmds = append(cmds, cmd)
+	case spinner.TickMsg:
+		m.Meta, cmd = m.Meta.Update(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	return m, tea.Batch(cmds...)
@@ -92,10 +106,16 @@ func (m *Model) View() string {
 	case ListView:
 		content = m.List.View()
 		helpView = m.Help.View(m.List.Keys)
+		content = listComponentStyle.Render(content + "\n" + helpView)
+
+		meta := metaComponentStyle.Render(m.Meta.View())
+		content = lipgloss.JoinHorizontal(lipgloss.Top, content, meta)
+		return content
 	case CreateView:
 		content = m.Create.View()
 		helpView = m.Help.View(m.Create.Keys)
+		return content + "\n" + helpView
 	}
 
-	return content + "\n" + helpView
+	return "this view is not handled ;c"
 }

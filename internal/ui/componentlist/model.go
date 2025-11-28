@@ -7,10 +7,11 @@ import (
 )
 
 type Model struct {
-	List   list.Model
-	Keys   KeyMap
-	Width  int
-	Height int
+	List         list.Model
+	Keys         KeyMap
+	Width        int
+	Height       int
+	LastSelected string
 }
 
 func New() Model {

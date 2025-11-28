@@ -52,7 +52,7 @@ func (m *Model) View() string{
 var StylesTemplate = `package {{.Name}}
 
 import(
-	tea "github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var(

@@ -11,10 +11,21 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.Width, m.Height = msg.Width, msg.Height
-		m.List.SetSize(msg.Width-6, msg.Height-4) // Reserve space for help
+		m.Width, m.Height = msg.Width/4, msg.Height-3
+		m.List.SetSize(msg.Width/2, msg.Height/2)
 	}
 	m.List, cmd = m.List.Update(msg)
+
+	if m.List.SelectedItem() != nil {
+		currentSelected := m.List.SelectedItem().FilterValue()
+		if currentSelected != m.LastSelected {
+			m.LastSelected = currentSelected
+			return m, tea.Batch(cmd, func() tea.Msg {
+				return models.ItemChangedMsg{Name: currentSelected}
+			})
+		}
+	}
+
 	return m, cmd
 }
 

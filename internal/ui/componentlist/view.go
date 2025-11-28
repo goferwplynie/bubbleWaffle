@@ -6,6 +6,6 @@ func (m Model) View() string {
 	return lipgloss.NewStyle().
 		Width(m.Width).
 		Height(m.Height).
-		Align(lipgloss.Center, lipgloss.Center).
+		Padding(1).
 		Render(m.List.View())
 }
