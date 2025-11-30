@@ -11,11 +11,13 @@ type Model struct {
 	Metadata         models.Metadata
 	Spinner          spinner.Model
 	Tick             bool
+	CurrentPath      string
 }
 
 func New() Model {
 	return Model{
-		Spinner: spinner.New(spinner.WithSpinner(spinner.Dot)),
-		Tick:    false,
+		Spinner:     spinner.New(spinner.WithSpinner(spinner.Dot)),
+		Tick:        false,
+		CurrentPath: ".",
 	}
 }

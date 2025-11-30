@@ -15,8 +15,16 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.Fp.SetHeight(msg.Height / 2)
 	case tea.KeyMsg:
 		if key.Matches(msg, m.Keys.PickDir) {
-			return m, nil
+			return m, func() tea.Msg {
+				return DirChanged{
+					New: m.Fp.CurrentDirectory,
+				}
+			}
 		}
 	}
 	return m, cmd
+}
+
+type DirChanged struct {
+	New string
 }

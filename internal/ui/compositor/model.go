@@ -35,6 +35,7 @@ type Model struct {
 	State       State
 	Width       int
 	Height      int
+	CurrentPath string
 }
 
 func New() *Model {
@@ -46,6 +47,7 @@ func New() *Model {
 		Meta:        metacomponent.New(),
 		CurrentView: MainView,
 		State:       List,
+		CurrentPath: ".",
 	}
 }
 
@@ -113,7 +115,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case componentcreate.ComponentCreatedMsg:
-		m.List.RefreshList()
+		m.List.RefreshList(m.CurrentPath)
 		m.CurrentView = MainView
 
 	case models.ItemChangedMsg, models.ComponentMetaMsg:
@@ -121,6 +123,17 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	case spinner.TickMsg:
 		m.Meta, cmd = m.Meta.Update(msg)
+		cmds = append(cmds, cmd)
+	case dirpicker.DirChanged:
+		m.CurrentPath = msg.New
+		m.State = List
+		//refresh list
+		m.List.RefreshList(m.CurrentPath)
+		//update meta
+		m.Meta, cmd = m.Meta.Update(models.ItemChangedMsg{
+			//get selected item name
+			Name: m.List.List.SelectedItem().FilterValue(),
+		})
 		cmds = append(cmds, cmd)
 	default:
 		m.List, cmd = m.List.Update(msg)

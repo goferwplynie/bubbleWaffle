@@ -29,8 +29,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *Model) RefreshList() {
-	components, _ := creator.GetComponents(".")
+func (m *Model) RefreshList(path string) {
+	components, _ := creator.GetComponents(path)
 	var items []list.Item
 	for _, v := range components {
 		items = append(items, models.Component{Name: v})
