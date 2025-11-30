@@ -1,6 +1,10 @@
 package dirpicker
 
-import "github.com/charmbracelet/bubbles/filepicker"
+import (
+	"path/filepath"
+
+	"github.com/charmbracelet/bubbles/filepicker"
+)
 
 type Model struct {
 	Fp            filepicker.Model
@@ -11,9 +15,10 @@ type Model struct {
 func New() Model {
 	fp := filepicker.New()
 	fp.ShowPermissions = false
-	fp.ShowHidden = false
+	fp.ShowHidden = true
 	fp.ShowSize = false
 	fp.DirAllowed = true
+	fp.CurrentDirectory, _ = filepath.Abs("./")
 	return Model{
 		Fp:   fp,
 		Keys: DefaultKeyMap(),

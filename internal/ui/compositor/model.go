@@ -11,13 +11,17 @@ import (
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentlist"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/dirpicker"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/metacomponent"
+	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
 
+type View = int
+type State = int
+
 const (
-	MainView = iota
+	MainView View = iota
 	CreateView
 
-	List = iota
+	List State = iota
 	FilePicker
 )
 
@@ -27,8 +31,8 @@ type Model struct {
 	Meta        metacomponent.Model
 	Fp          dirpicker.Model
 	Help        help.Model
-	CurrentView int
-	State       int
+	CurrentView View
+	State       State
 	Width       int
 	Height      int
 }
@@ -41,7 +45,7 @@ func New() *Model {
 		Fp:          dirpicker.New(),
 		Meta:        metacomponent.New(),
 		CurrentView: MainView,
-		State:       FilePicker,
+		State:       List,
 	}
 }
 
@@ -75,12 +79,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch m.CurrentView {
 		case MainView:
-			if key.Matches(msg, key.NewBinding(key.WithKeys("c"))) {
-				if m.State == 0 {
-					m.State = 1
-				}
-				if m.State == 1 {
-					m.State = 0
+			if key.Matches(msg, key.NewBinding(key.WithKeys("d", "esc"))) {
+				switch m.State {
+				case List:
+					m.State = FilePicker
+				case FilePicker:
+					m.State = List
 				}
 				return m, nil
 			}
@@ -142,7 +146,12 @@ func (m *Model) View() string {
 
 		meta := metaComponentStyle.Render(m.Meta.View())
 		fp := m.Fp.View()
-		content = lipgloss.JoinHorizontal(lipgloss.Top, content, meta, fp)
+		content = lipgloss.JoinHorizontal(lipgloss.Top, content, meta)
+		content = lipgloss.NewStyle().Width(m.Width).Height(m.Height).Render(content)
+		if m.State == FilePicker {
+			content = lipgloss.NewStyle().Faint(true).Render(content)
+			content = overlay.Composite(fp, content, overlay.Center, overlay.Center, 0, 0)
+		}
 		return content
 	case CreateView:
 		content = m.Create.View()
