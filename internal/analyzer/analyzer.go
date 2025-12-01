@@ -21,7 +21,7 @@ func AnalyzeComponent(componentName string, rootPath string) (models.Metadata, e
 		Dir:  rootPath,
 	}
 
-	pkgs, err := packages.Load(cfg, "./...")
+	pkgs, err := packages.Load(cfg, rootPath+"/...")
 	if err != nil {
 		return meta, fmt.Errorf("failed to load packages: %w", err)
 	}
