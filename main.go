@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	_, err := analyzer.LoadComponents(".")
+	_, err := analyzer.LoadComponents("./")
 	if err != nil {
 		panic(err)
 	}

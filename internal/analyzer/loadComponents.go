@@ -14,10 +14,8 @@ type Component struct {
 
 func LoadComponents(rootPath string) ([]Component, error) {
 	var components []Component
-	var modelInterface *types.Interface
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports | packages.NeedDeps,
-		Dir:  rootPath,
 	}
 
 	pkgs, err := packages.Load(cfg, rootPath+"/...")
@@ -27,24 +25,65 @@ func LoadComponents(rootPath string) ([]Component, error) {
 
 	for _, pkg := range pkgs {
 		scope := pkg.Types.Scope()
-		lookup := scope.Lookup("Model")
-
-		modelInterface = (lookup.Type().Underlying().(*types.Interface))
-	}
-
-	for _, pkg := range pkgs {
-		scope := pkg.Types.Scope()
 
 		for _, name := range scope.Names() {
 			obj := scope.Lookup(name)
 			if _, ok := obj.Type().Underlying().(*types.Struct); ok {
 				ptr := types.NewPointer(obj.Type())
-				if types.Implements(ptr, modelInterface) {
-					fmt.Println(name)
+				if IsBubbleTeaModel(ptr) {
+					fmt.Println(pkg.Name)
+					components = append(components, Component{Name: name})
 				}
 			}
 		}
 	}
 
 	return components, nil
+}
+
+func IsBubbleTeaModel(t types.Type) bool {
+	ptr, ok := t.(*types.Pointer)
+	if !ok {
+		return false
+	}
+	named, ok := ptr.Elem().(*types.Named)
+	if !ok {
+		return false
+	}
+	pkg := named.Obj().Pkg()
+
+	if !checkInit(t, pkg) {
+		return false
+	}
+
+	return true
+}
+
+func checkMethod(t types.Type, pkg *types.Package, name string, params, results int) *types.Signature {
+	obj, _, _ := types.LookupFieldOrMethod(t, true, pkg, name)
+	if obj == nil {
+		return nil
+	}
+
+	if fun, ok := obj.(*types.Func); ok {
+		if sig, ok := fun.Type().(*types.Signature); ok {
+			if sig.Results().Len() == results && sig.Params().Len() == params {
+				return sig
+			}
+		}
+	}
+
+	return nil
+
+}
+
+func checkInit(t types.Type, pkg *types.Package) bool {
+	sig := checkMethod(t, pkg, "Init", 0, 1)
+	if sig == nil {
+		return false
+	}
+
+	sig.Results().At(0).Type()
+
+	return false
 }
