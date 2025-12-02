@@ -3,9 +3,13 @@ package componentlist
 import "github.com/charmbracelet/lipgloss"
 
 func (m Model) View() string {
+	var loading string
+	if m.Loading {
+		loading = "Loading components " + m.spinner.View() + "\n"
+	}
 	return lipgloss.NewStyle().
 		Width(m.Width).
 		Height(m.Height).
 		Padding(1).
-		Render(m.List.View())
+		Render(loading + m.List.View())
 }

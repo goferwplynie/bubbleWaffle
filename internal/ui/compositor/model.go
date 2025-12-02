@@ -51,11 +51,11 @@ func New() *Model {
 	}
 }
 
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return tea.Batch(m.List.Init(), m.Create.Init(), m.Meta.Init(), m.Fp.Init())
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
@@ -124,6 +124,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case spinner.TickMsg:
 		m.Meta, cmd = m.Meta.Update(msg)
 		cmds = append(cmds, cmd)
+
+		m.List, cmd = m.List.Update(msg)
+		cmds = append(cmds, cmd)
 	case dirpicker.DirChanged:
 		m.CurrentPath = msg.New
 		m.State = List
@@ -147,7 +150,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m Model) View() string {
+func (m *Model) View() string {
 	var content string
 	var helpView string
 

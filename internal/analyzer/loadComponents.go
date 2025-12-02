@@ -48,7 +48,7 @@ func LoadComponents(rootPath string) ([]Component, error) {
 			if _, ok := obj.Type().Underlying().(*types.Struct); ok {
 				ptr := types.NewPointer(obj.Type())
 				if IsBubbleTeaModel(ptr, modelInterface) {
-					components = append(components, Component{Name: name})
+					components = append(components, Component{Name: pkg.Name})
 				}
 			}
 		}
