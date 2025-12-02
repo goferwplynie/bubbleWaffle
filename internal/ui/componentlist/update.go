@@ -24,6 +24,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.spinner, cmd = m.spinner.Update(msg)
 			cmds = append(cmds, cmd)
 		}
+	case ComponentCreatedMsg:
+		m.Loading = true
+		cmds = append(cmds, LoadList, m.spinner.Tick)
+
 	}
 	m.List, cmd = m.List.Update(msg)
 	cmds = append(cmds, cmd)
@@ -51,3 +55,5 @@ func (m *Model) RefreshList(path string) {
 	}
 	m.List.SetItems(items)
 }
+
+type ComponentCreatedMsg struct{}

@@ -115,7 +115,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case componentcreate.ComponentCreatedMsg:
-		m.List.RefreshList(m.CurrentPath)
+		m.List, cmd = m.List.Update(componentlist.ComponentCreatedMsg{})
+		cmds = append(cmds, cmd)
 		m.CurrentView = MainView
 
 	case models.ItemChangedMsg, models.ComponentMetaMsg:
@@ -124,7 +125,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case spinner.TickMsg:
 		m.Meta, cmd = m.Meta.Update(msg)
 		cmds = append(cmds, cmd)
-
 		m.List, cmd = m.List.Update(msg)
 		cmds = append(cmds, cmd)
 	case dirpicker.DirChanged:
