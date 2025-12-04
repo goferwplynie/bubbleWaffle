@@ -10,6 +10,7 @@ import (
 type Component struct {
 	Name     string
 	Children []Component
+	Parents  []Component
 }
 
 func LoadComponents(rootPath string) ([]Component, error) {
