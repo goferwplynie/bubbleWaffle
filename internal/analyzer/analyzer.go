@@ -40,6 +40,25 @@ func FindComponentChildren(pkg *packages.Package) []string {
 }
 
 func IsParent(pkg *packages.Package, componentName string) bool {
+	for _, file := range pkg.Syntax {
+		ast.Inspect(file, func(node ast.Node) bool {
+			//going through components ~w~ (again)
+			if typeSpec, ok := node.(*ast.TypeSpec); ok {
+				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+					for _, field := range structType.Fields.List {
+						if selector, ok := field.Type.(*ast.SelectorExpr); ok {
+							if xIdent, ok := selector.X.(*ast.Ident); ok {
+								if xIdent.Name == componentName && selector.Sel.Name == "Model" {
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
+			return true
+		})
+	}
 	return false
 }
 
@@ -64,47 +83,22 @@ func AnalyzeComponent(componentName string, rootPath string) (models.Metadata, e
 	//find component and it's children
 	for _, pkg := range pkgs {
 		//check if any file in the package is in rootPath/componentName
-		isComponentPkg := false
 		for _, file := range pkg.GoFiles {
 			if strings.Contains(filepath.Dir(file), filepath.Join(rootPath, componentName)) {
-				isComponentPkg = true
+				componentPackageName = pkg.Name
 				break
 			}
 		}
+	}
 
-		if isComponentPkg {
-			componentPackageName = pkg.Name
+	for _, pkg := range pkgs {
+		if pkg.Name == componentPackageName {
 			meta.PackageName = pkg.Name
 
 			meta.Children = append(meta.Children, FindComponentChildren(pkg)...)
 		}
-	}
-
-	//find usages
-	for _, pkg := range pkgs {
-		if pkg.Name == componentPackageName {
-			continue
-		}
-
-		for _, file := range pkg.Syntax {
-			ast.Inspect(file, func(node ast.Node) bool {
-				//going through components ~w~ (again)
-				if typeSpec, ok := node.(*ast.TypeSpec); ok {
-					if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-						for _, field := range structType.Fields.List {
-							if selector, ok := field.Type.(*ast.SelectorExpr); ok {
-								if xIdent, ok := selector.X.(*ast.Ident); ok {
-									if xIdent.Name == componentPackageName && selector.Sel.Name == "Model" {
-										meta.Usages = append(meta.Usages, pkg.Name)
-										return false
-									}
-								}
-							}
-						}
-					}
-				}
-				return true
-			})
+		if IsParent(pkg, componentPackageName) {
+			meta.Usages = append(meta.Usages, pkg.Name)
 		}
 	}
 

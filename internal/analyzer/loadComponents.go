@@ -3,6 +3,7 @@ package analyzer
 import (
 	"fmt"
 	"go/types"
+	"time"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -14,33 +15,16 @@ type Component struct {
 }
 
 func LoadComponents(rootPath string) ([]Component, error) {
+	start := time.Now()
 	var components []Component
 	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports | packages.NeedDeps,
+		Mode: packages.NeedName | packages.NeedSyntax | packages.NeedFiles | packages.NeedTypes | packages.NeedTypesInfo,
 	}
 
 	pkgs, err := packages.Load(cfg, rootPath+"/...")
 	if err != nil {
 		return components, fmt.Errorf("failed to load packages: %w", err)
 	}
-
-	var modelInterface *types.Interface
-	for _, pkg := range pkgs {
-		if bt, ok := pkg.Imports["github.com/charmbracelet/bubbletea"]; ok {
-			obj := bt.Types.Scope().Lookup("Model")
-			if obj != nil {
-				if iface, ok := obj.Type().Underlying().(*types.Interface); ok {
-					modelInterface = iface
-					break
-				}
-			}
-		}
-	}
-
-	if modelInterface == nil {
-		return components, fmt.Errorf("cannot find bubbletea.Model interface in loaded packages")
-	}
-
 	for _, pkg := range pkgs {
 		scope := pkg.Types.Scope()
 
@@ -48,21 +32,18 @@ func LoadComponents(rootPath string) ([]Component, error) {
 			obj := scope.Lookup(name)
 			if _, ok := obj.Type().Underlying().(*types.Struct); ok {
 				ptr := types.NewPointer(obj.Type())
-				if IsBubbleTeaModel(ptr, modelInterface) {
+				if IsBubbleTeaModel(ptr) {
 					components = append(components, Component{Name: pkg.Name})
 				}
 			}
 		}
 	}
 
+	fmt.Println(time.Since(start))
 	return components, nil
 }
 
-func IsBubbleTeaModel(t types.Type, modelInterface *types.Interface) bool {
-	if types.Implements(t, modelInterface) {
-		return true
-	}
-
+func IsBubbleTeaModel(t types.Type) bool {
 	ptr, ok := t.(*types.Pointer)
 	if !ok {
 		return false
@@ -77,7 +58,7 @@ func IsBubbleTeaModel(t types.Type, modelInterface *types.Interface) bool {
 		return false
 	}
 
-	if !checkUpdate(t, pkg, modelInterface) {
+	if !checkUpdate(t, pkg) {
 		return false
 	}
 
@@ -128,7 +109,7 @@ func checkInit(t types.Type, pkg *types.Package) bool {
 	return true
 }
 
-func checkUpdate(t types.Type, pkg *types.Package, modelInterface *types.Interface) bool {
+func checkUpdate(t types.Type, pkg *types.Package) bool {
 	sig := checkMethod(t, pkg, "Update", 1, 2)
 	if sig == nil {
 		return false
@@ -137,9 +118,7 @@ func checkUpdate(t types.Type, pkg *types.Package, modelInterface *types.Interfa
 	var implements bool
 	res1 := sig.Results().At(0).Type()
 
-	if types.Implements(res1, modelInterface) {
-		implements = true
-	} else if types.Identical(res1, t) {
+	if types.Identical(res1, t) {
 		implements = true
 	} else if ptr, ok := t.(*types.Pointer); ok && types.Identical(res1, ptr.Elem()) {
 		implements = true
