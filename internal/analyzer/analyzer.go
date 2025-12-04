@@ -10,6 +10,39 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
+func FindComponentChildren(pkg *packages.Package) []string {
+	var children []string
+
+	for _, file := range pkg.Syntax {
+		ast.Inspect(file, func(node ast.Node) bool {
+			//going through node ~w~
+			if typeSpec, ok := node.(*ast.TypeSpec); ok {
+				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+					for _, field := range structType.Fields.List {
+						if field.Type != nil {
+							if selector, ok := field.Type.(*ast.SelectorExpr); ok {
+								if strings.HasSuffix(selector.Sel.Name, "Model") {
+									if xIdent, ok := selector.X.(*ast.Ident); ok {
+										childName := xIdent.Name + "." + selector.Sel.Name
+										children = append(children, childName)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return true
+		})
+	}
+
+	return children
+}
+
+func IsParent(pkg *packages.Package, componentName string) bool {
+	return false
+}
+
 func AnalyzeComponent(componentName string, rootPath string) (models.Metadata, error) {
 	meta := models.Metadata{
 		Children: []string{},
@@ -43,29 +76,7 @@ func AnalyzeComponent(componentName string, rootPath string) (models.Metadata, e
 			componentPackageName = pkg.Name
 			meta.PackageName = pkg.Name
 
-			for _, file := range pkg.Syntax {
-				ast.Inspect(file, func(node ast.Node) bool {
-					//going through node ~w~
-					if typeSpec, ok := node.(*ast.TypeSpec); ok {
-						if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-							for _, field := range structType.Fields.List {
-								if field.Type != nil {
-									if selector, ok := field.Type.(*ast.SelectorExpr); ok {
-										if strings.HasSuffix(selector.Sel.Name, "Model") {
-											if xIdent, ok := selector.X.(*ast.Ident); ok {
-												childName := xIdent.Name + "." + selector.Sel.Name
-												meta.Children = append(meta.Children, childName)
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					return true
-				})
-			}
-			break
+			meta.Children = append(meta.Children, FindComponentChildren(pkg)...)
 		}
 	}
 
