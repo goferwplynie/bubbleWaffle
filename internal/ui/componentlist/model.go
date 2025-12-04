@@ -2,8 +2,7 @@ package componentlist
 
 import (
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/goferwplynie/bubbleWaffle/internal/creator"
-	"github.com/goferwplynie/bubbleWaffle/internal/models"
+	"github.com/charmbracelet/bubbles/spinner"
 )
 
 type Model struct {
@@ -12,20 +11,12 @@ type Model struct {
 	Width        int
 	Height       int
 	LastSelected string
+	spinner      spinner.Model
+	Loading      bool
 }
 
 func New() Model {
-	components, err := creator.GetComponents(".")
-	if err != nil {
-		components = []string{}
-	}
 	var items []list.Item
-	for _, v := range components {
-		items = append(items, models.Component{
-			Name: v,
-		})
-	}
-
 	delegate := list.NewDefaultDelegate()
 	delegate.ShowDescription = false
 
@@ -34,7 +25,9 @@ func New() Model {
 	itemList.SetShowHelp(false) // We will handle help globally
 
 	return Model{
-		List: itemList,
-		Keys: DefaultKeyMap(),
+		List:    itemList,
+		Keys:    DefaultKeyMap(),
+		spinner: spinner.New(spinner.WithSpinner(spinner.Dot)),
+		Loading: true,
 	}
 }
