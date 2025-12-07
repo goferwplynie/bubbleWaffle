@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/goferwplynie/bubbleWaffle/cmd"
+	"fmt"
+
+	"github.com/goferwplynie/bubbleWaffle/internal/analyzer"
 )
 
 func main() {
-	cmd.Execute()
+	//cmd.Execute()
+	comps, _ := analyzer.LoadComponents(".")
+	fmt.Println(comps)
 }
