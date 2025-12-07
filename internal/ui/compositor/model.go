@@ -1,17 +1,17 @@
 package compositor
 
 import (
-	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/spinner"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/goferwplynie/bubbleWaffle/internal/models"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentcreate"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentlist"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/dirpicker"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/metacomponent"
-	overlay "github.com/rmhubbert/bubbletea-overlay"
+	"github.com/goferwplynie/bubbleWaffle/internal/utils"
 )
 
 type View = int
@@ -62,7 +62,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.Width, m.Height = msg.Width, msg.Height
-		m.Help.Width = msg.Width
+		m.Help.SetWidth(msg.Width)
 		// Update children size
 		m.List, cmd = m.List.Update(msg)
 		cmds = append(cmds, cmd)
@@ -150,30 +150,40 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m *Model) View() string {
+func (m *Model) View() tea.View {
 	var content string
 	var helpView string
 
+	view := tea.NewView("")
+	view.AltScreen = true
+
 	switch m.CurrentView {
 	case MainView:
-		content = m.List.View()
+		listView := utils.ViewToString(m.List.View())
 		helpView = m.Help.View(m.List.Keys)
-		content = listComponentStyle.Render(content + "\n" + helpView)
 
-		meta := metaComponentStyle.Render(m.Meta.View())
+		listView = listComponentStyle.Render(listView + "\n" + helpView)
+
+		meta := metaComponentStyle.Render(utils.ViewToString(m.Meta.View()))
 		fp := m.Fp.View()
-		content = lipgloss.JoinHorizontal(lipgloss.Top, content, meta)
+		content = lipgloss.JoinHorizontal(lipgloss.Top, listView, meta)
 		content = lipgloss.NewStyle().Width(m.Width).Height(m.Height).Render(content)
 		if m.State == FilePicker {
 			content = lipgloss.NewStyle().Faint(true).Render(content)
-			content = overlay.Composite(fp, content, overlay.Center, overlay.Center, 0, 0)
+			mainLayer := lipgloss.NewLayer(content)
+			fpLayer := lipgloss.NewLayer(fp.Content)
+			canvas := lipgloss.NewCanvas(mainLayer, fpLayer)
+			view.SetContent(canvas)
 		}
-		return content
+		view.SetContent(content)
 	case CreateView:
-		content = m.Create.View()
+		content = utils.ViewToString(m.Create.View())
 		helpView = m.Help.View(m.Create.Keys)
-		return content + "\n" + helpView
+		view.SetContent(content + "\n" + helpView)
+	default:
+		view.SetContent("this view is not handled ;c")
+
 	}
 
-	return "this view is not handled ;c"
+	return view
 }

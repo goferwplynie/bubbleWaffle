@@ -1,8 +1,8 @@
 package componentlist
 
 import (
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
+	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/spinner"
 )
 
 type Model struct {

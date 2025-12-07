@@ -1,8 +1,6 @@
 package componentcreate
 
-import (
-	"github.com/charmbracelet/bubbles/textinput"
-)
+import "charm.land/bubbles/v2/textinput"
 
 type Option struct {
 	label   string
@@ -30,7 +28,7 @@ func New() Model {
 	ti.Placeholder = "Component Name"
 	ti.Focus()
 	ti.CharLimit = 156
-	ti.Width = 20
+	ti.SetWidth(20)
 
 	return Model{
 		TextInput:      ti,

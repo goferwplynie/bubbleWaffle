@@ -1,6 +1,6 @@
 package dirpicker
 
-import "github.com/charmbracelet/bubbles/key"
+import "charm.land/bubbles/v2/key"
 
 type KeyMap struct {
 	PickDir  key.Binding

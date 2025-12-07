@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/compositor"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +16,7 @@ var tuiCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		comp := compositor.New()
-		if _, err := tea.NewProgram(comp, tea.WithAltScreen()).Run(); err != nil {
+		if _, err := tea.NewProgram(comp).Run(); err != nil {
 			fmt.Println("Error running program:", err)
 			os.Exit(1)
 		}

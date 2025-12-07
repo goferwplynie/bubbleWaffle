@@ -1,9 +1,9 @@
 package componentlist
 
 import (
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
+	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/spinner"
+	tea "charm.land/bubbletea/v2"
 	"github.com/goferwplynie/bubbleWaffle/internal/creator"
 	"github.com/goferwplynie/bubbleWaffle/internal/models"
 )

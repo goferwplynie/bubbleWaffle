@@ -11,7 +11,7 @@ func New() *Model{
 var InitTemplate = `package {{.Name}}
 
 import(
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func (m *Model) Init() tea.Cmd{
@@ -21,7 +21,7 @@ func (m *Model) Init() tea.Cmd{
 var UpdateTemplate = `package {{.Name}}
 
 import(
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd){

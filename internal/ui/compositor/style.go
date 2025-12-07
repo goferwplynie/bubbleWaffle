@@ -1,6 +1,6 @@
 package compositor
 
-import "github.com/charmbracelet/lipgloss"
+import "charm.land/lipgloss/v2"
 
 var (
 	listComponentStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder())

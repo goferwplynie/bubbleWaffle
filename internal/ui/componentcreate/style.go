@@ -1,6 +1,6 @@
 package componentcreate
 
-import "github.com/charmbracelet/lipgloss"
+import "charm.land/lipgloss/v2"
 
 var (
 	inputStyle = lipgloss.NewStyle().

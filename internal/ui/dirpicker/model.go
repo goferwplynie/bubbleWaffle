@@ -3,7 +3,7 @@ package dirpicker
 import (
 	"path/filepath"
 
-	"github.com/charmbracelet/bubbles/filepicker"
+	"charm.land/bubbles/v2/filepicker"
 )
 
 type Model struct {
