@@ -3,21 +3,18 @@ package metacomponent
 import (
 	"strings"
 
-	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 )
 
 var ()
 
-func (m Model) View() tea.View {
-	view := tea.NewView("")
+func (m Model) View() string {
 	if m.CurrentComponent == "" {
-		view.SetContent(lipgloss.NewStyle().
+		return lipgloss.NewStyle().
 			Width(m.width).
 			Height(m.height).
 			Align(lipgloss.Center, lipgloss.Center).
-			Render("Select a component to view metadata"))
-		return view
+			Render("Select a component to view metadata")
 	}
 
 	var s strings.Builder
@@ -57,10 +54,9 @@ func (m Model) View() tea.View {
 		s.WriteString("\n")
 	}
 
-	view.SetContent(lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		Width(m.width).
 		Height(m.height).
 		Padding(1).
-		Render(s.String()))
-	return view
+		Render(s.String())
 }

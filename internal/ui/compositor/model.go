@@ -11,7 +11,6 @@ import (
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/componentlist"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/dirpicker"
 	"github.com/goferwplynie/bubbleWaffle/internal/ui/metacomponent"
-	"github.com/goferwplynie/bubbleWaffle/internal/utils"
 )
 
 type View = int
@@ -159,25 +158,28 @@ func (m *Model) View() tea.View {
 
 	switch m.CurrentView {
 	case MainView:
-		listView := utils.ViewToString(m.List.View())
+		listView := m.List.View()
 		helpView = m.Help.View(m.List.Keys)
 
 		listView = listComponentStyle.Render(listView + "\n" + helpView)
 
-		meta := metaComponentStyle.Render(utils.ViewToString(m.Meta.View()))
+		meta := metaComponentStyle.Render(m.Meta.View())
 		fp := m.Fp.View()
 		content = lipgloss.JoinHorizontal(lipgloss.Top, listView, meta)
 		content = lipgloss.NewStyle().Width(m.Width).Height(m.Height).Render(content)
 		if m.State == FilePicker {
 			content = lipgloss.NewStyle().Faint(true).Render(content)
+			fpLayer := lipgloss.NewLayer(fp)
 			mainLayer := lipgloss.NewLayer(content)
-			fpLayer := lipgloss.NewLayer(fp.Content)
-			canvas := lipgloss.NewCanvas(mainLayer, fpLayer)
-			view.SetContent(canvas)
+			xCenter := (m.Width / 2) - (fpLayer.GetWidth() / 2)
+			yCenter := (m.Height / 2) - (fpLayer.GetHeight() / 2)
+
+			view.SetContent(lipgloss.NewCanvas(mainLayer, fpLayer.Z(1).X(xCenter).Y(yCenter)).Render())
+		} else {
+			view.SetContent(content)
 		}
-		view.SetContent(content)
 	case CreateView:
-		content = utils.ViewToString(m.Create.View())
+		content = m.Create.View()
 		helpView = m.Help.View(m.Create.Keys)
 		view.SetContent(content + "\n" + helpView)
 	default:

@@ -3,11 +3,10 @@ package componentcreate
 import (
 	"fmt"
 
-	tea "charm.land/bubbletea/v2"
 	lipgloss "charm.land/lipgloss/v2"
 )
 
-func (m Model) View() tea.View {
+func (m Model) View() string {
 	var content string
 
 	// Title
@@ -49,14 +48,12 @@ func (m Model) View() tea.View {
 		btnStyle = activeButtonStyle
 	}
 	content += "\n" + btnStyle.Render("Create")
-	view := tea.NewView("")
 
-	view.SetContent(lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		Width(m.Width).
 		Height(m.Height).
 		Align(lipgloss.Center, lipgloss.Center).
 		Render(
 			popupStyle.Render(content),
-		))
-	return view
+		)
 }
