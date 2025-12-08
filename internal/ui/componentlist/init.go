@@ -19,11 +19,11 @@ func LoadList() tea.Msg {
 			Name: v.Name,
 		})
 	}
-	return updateList{
+	return UpdateList{
 		Items: items,
 	}
 }
 
-type updateList struct {
+type UpdateList struct {
 	Items []list.Item
 }

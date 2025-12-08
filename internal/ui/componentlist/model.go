@@ -22,7 +22,7 @@ func New() Model {
 
 	itemList := list.New(items, delegate, 0, 0)
 	itemList.Title = "Components"
-	itemList.SetShowHelp(false) // We will handle help globally
+	itemList.SetShowHelp(false)
 
 	return Model{
 		List:    itemList,

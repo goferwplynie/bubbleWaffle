@@ -1,10 +1,12 @@
 package componentlist
 
 import (
+	"fmt"
+
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/spinner"
 	tea "charm.land/bubbletea/v2"
-	"github.com/goferwplynie/bubbleWaffle/internal/creator"
+	"github.com/goferwplynie/bubbleWaffle/internal/analyzer"
 	"github.com/goferwplynie/bubbleWaffle/internal/models"
 )
 
@@ -15,7 +17,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.Width, m.Height = msg.Width/4, msg.Height-3
 		m.List.SetSize(msg.Width/2, msg.Height/2)
-	case updateList:
+	case UpdateList:
 		cmd = m.List.SetItems(msg.Items)
 		cmds = append(cmds, cmd)
 		m.Loading = false
@@ -47,13 +49,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m *Model) RefreshList(path string) {
-	components, _ := creator.GetComponents(path)
+func RefreshList(path string) []list.Item {
+	fmt.Println(path)
+	components, _ := analyzer.LoadComponents(path)
 	var items []list.Item
 	for _, v := range components {
-		items = append(items, models.Component{Name: v})
+		items = append(items, models.Component{Name: v.Name})
 	}
-	m.List.SetItems(items)
+	return items
 }
 
 type ComponentCreatedMsg struct{}

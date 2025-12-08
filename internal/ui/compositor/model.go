@@ -129,13 +129,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case dirpicker.DirChanged:
 		m.CurrentPath = msg.New
 		m.State = List
-		//refresh list
-		m.List.RefreshList(m.CurrentPath)
-		//update meta
-		m.Meta, cmd = m.Meta.Update(models.ItemChangedMsg{
-			//get selected item name
-			Name: m.List.List.SelectedItem().FilterValue(),
-		})
+		cmd = func() tea.Msg {
+			items := componentlist.RefreshList(msg.New)
+			return componentlist.UpdateList{
+				Items: items,
+			}
+		}
+		m.Meta.SetCurrentPath(msg.New)
 		cmds = append(cmds, cmd)
 	default:
 		m.List, cmd = m.List.Update(msg)

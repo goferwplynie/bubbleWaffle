@@ -19,6 +19,7 @@ func (m Model) View() string {
 
 	var s strings.Builder
 
+	s.WriteString("currentPath: " + m.CurrentPath)
 	s.WriteString(titleStyle.Render("Metadata: " + m.CurrentComponent))
 	if m.Tick {
 		s.WriteString(" " + m.Spinner.View())

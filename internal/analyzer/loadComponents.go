@@ -59,7 +59,7 @@ func NewMockImporter() (*MockImporter, error) {
 }
 
 func (m *MockImporter) Import(path string) (*types.Package, error) {
-	if path == "charm.land/bubbletea/v2" {
+	if path == "charm.land/bubbletea/v2" || path == "github.com/charmbracelet/bubbletea" {
 		return m.mockPackage, nil
 	}
 
