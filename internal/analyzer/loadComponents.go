@@ -70,6 +70,7 @@ func (m *MockImporter) Import(path string) (*types.Package, error) {
 }
 
 func LoadComponents(rootPath string) ([]Component, error) {
+	fmt.Println(rootPath)
 	var components []Component
 
 	cfg := &packages.Config{

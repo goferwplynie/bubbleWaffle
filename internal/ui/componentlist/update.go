@@ -1,12 +1,8 @@
 package componentlist
 
 import (
-	"fmt"
-
-	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/spinner"
 	tea "charm.land/bubbletea/v2"
-	"github.com/goferwplynie/bubbleWaffle/internal/analyzer"
 	"github.com/goferwplynie/bubbleWaffle/internal/models"
 )
 
@@ -28,7 +24,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	case ComponentCreatedMsg:
 		m.Loading = true
-		cmds = append(cmds, LoadList, m.spinner.Tick)
+		cmds = append(cmds, func() tea.Msg { return LoadList(m.CurrentPath) }, m.spinner.Tick)
+	case DirChangedMsg:
+		cmds = append(cmds, func() tea.Msg { return LoadList(m.CurrentPath) })
 
 	}
 	m.List, cmd = m.List.Update(msg)
@@ -49,14 +47,5 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func RefreshList(path string) []list.Item {
-	fmt.Println(path)
-	components, _ := analyzer.LoadComponents(path)
-	var items []list.Item
-	for _, v := range components {
-		items = append(items, models.Component{Name: v.Name})
-	}
-	return items
-}
-
 type ComponentCreatedMsg struct{}
+type DirChangedMsg struct{}

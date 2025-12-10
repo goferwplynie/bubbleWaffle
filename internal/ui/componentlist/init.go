@@ -8,11 +8,12 @@ import (
 )
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(LoadList, m.spinner.Tick)
+	initList := func() tea.Msg { return LoadList(".") }
+	return tea.Batch(initList, m.spinner.Tick)
 }
 
-func LoadList() tea.Msg {
-	components, _ := analyzer.LoadComponents(".")
+func LoadList(path string) tea.Msg {
+	components, _ := analyzer.LoadComponents(path)
 	var items []list.Item
 	for _, v := range components {
 		items = append(items, models.Component{

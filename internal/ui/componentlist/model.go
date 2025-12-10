@@ -13,6 +13,7 @@ type Model struct {
 	LastSelected string
 	spinner      spinner.Model
 	Loading      bool
+	CurrentPath  string
 }
 
 func New() Model {
@@ -25,9 +26,10 @@ func New() Model {
 	itemList.SetShowHelp(false)
 
 	return Model{
-		List:    itemList,
-		Keys:    DefaultKeyMap(),
-		spinner: spinner.New(spinner.WithSpinner(spinner.Dot)),
-		Loading: true,
+		List:        itemList,
+		Keys:        DefaultKeyMap(),
+		spinner:     spinner.New(spinner.WithSpinner(spinner.Dot)),
+		Loading:     true,
+		CurrentPath: ".",
 	}
 }
